@@ -1,0 +1,56 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\PC\\.ohos\\config\\default_MusicPlayerDemo_dYXRsWT4CrmAt4N7r1nSLnAEXYxuN5KNj2hc1NC3lhM=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B43C2D59DF47EB5777D0850729645D456ACCC616FEB9B4100C5A67166C6B08BAE6A8D34EA3B3AA9",
+          "profile": "C:\\Users\\PC\\.ohos\\config\\default_MusicPlayerDemo_dYXRsWT4CrmAt4N7r1nSLnAEXYxuN5KNj2hc1NC3lhM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\PC\\.ohos\\config\\default_MusicPlayerDemo_dYXRsWT4CrmAt4N7r1nSLnAEXYxuN5KNj2hc1NC3lhM=.p12",
+          "storePassword": "0000001BED0C715F7E73D76D30782A2A70D6E8BD6C435ED722D2DB32F1DC4DFAF76FC1F31DD6CE9DE9093A"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "6.0.0(20)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
