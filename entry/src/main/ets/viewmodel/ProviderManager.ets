@@ -6,7 +6,7 @@ import { wantAgent } from "@kit.AbilityKit"
 import backgroundTaskManager from "@ohos.resourceschedule.backgroundTaskManager"
 
 //测试更新代码
-//测试1.0.1
+//测试1.0.2
 /**
  * AVMetadata 就是向系统和用户展示“现在正在播放什么”的详细信息集，是 AVSession 与系统 UI（锁屏、通知栏等）进行信息交互的核心数据载体。
  */

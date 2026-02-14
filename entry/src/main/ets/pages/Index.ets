@@ -82,7 +82,7 @@ struct Index {
         .backgroundColor(Color.Transparent)
         //做个三元运算，用isLike判断，默认为false，点一下就是true
         .onClick(() => {
-          console.log('八嘎')
+          console.log('测试代码，1.0.2')
         })
 
         Button({ stateEffect: true }) {
