@@ -17,6 +17,10 @@ struct Index {
   @StorageLink('isPlaying') isPlaying: boolean = false
   @StorageLink('currentPlayItem') currentPlayItem: avSession.AVQueueItem | null = null
   private providerManager: ProviderFeature | undefined
+  //链接到ProviderFeature中管理的收藏状态Map
+  @StorageLink('isFavorMap')isFavorMap:Map<String, boolean> = new Map<String, boolean>();
+  @StorageLink("CurrentAVMetadata") currentAVMetadata?: avSession.AVMetadata = undefined
+
 
   //init方法中存在异步，所以把它放到生命周期执行
   async aboutToAppear() {
@@ -75,14 +79,16 @@ struct Index {
       //横向的容器中五个按钮
       Row() {
         Button({ stateEffect: true }) {
-          Image(this.isLike ? $r('app.media.ic_public_favor_filled') : $r('app.media.ic_public_favor'))
+          Image(this.isFavorMap?.get(this.currentAVMetadata?.assetId) ?
+            $r('app.media.ic_public_favor_filled') :
+            $r('app.media.ic_public_favor'))
         }
         .width(30)
         .aspectRatio(1)
         .backgroundColor(Color.Transparent)
         //做个三元运算，用isLike判断，默认为false，点一下就是true
         .onClick(() => {
-          console.log('测试代码，1.0.2')
+          this.providerManager!.toggleFavorite()
         })
 
         Button({ stateEffect: true }) {
@@ -106,12 +112,14 @@ struct Index {
         .backgroundColor(Color.Transparent)
         //做播放/暂停逻辑
         .onClick(async () => {
-          if (this.isPlaying) {
-            await this.providerManager?.pause()
-          } else {
-            this.providerManager?.play()
-          }
+        //   if (this.isPlaying) {
+        //     await this.providerManager?.pause()
+        //   } else {
+        //     this.providerManager?.play()
+        //   }
+          this.providerManager?.playOrPause()
         })
+
 
         Button({ stateEffect: true }) {
           Image($r('app.media.ic_next'))
