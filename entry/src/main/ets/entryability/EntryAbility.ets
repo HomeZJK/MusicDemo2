@@ -22,6 +22,11 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
+    //———— 注入Context 到 MediaPlayer
+    const mediaPlayerInstance = MediaPlayer.getInstance()
+    //确保在调用setContext之前，this.context已经可用
+    //this.context 在 UIAbility 中基类中定义，通常在onCreate之后就可用了
+    mediaPlayerInstance.setContext(context)
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 

@@ -79,6 +79,8 @@ export default class MediaData {
     avQueueImage: 'third.png'
   };
   //播放列表
+  queueItems: Array<avSession.AVQueueItem> =
+    [this.queueItemFirst, this.queueItemSecond, this.queueItemThird]
   avMetadataList: Array<avSession.AVMetadata> = [this.avMetadataFirst, this.avMetadataSecond, this.avMetadataThird];
 
   static loopModeList = [
