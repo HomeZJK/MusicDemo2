@@ -30,6 +30,9 @@ export class ProviderFeature {
   //创建一个Map来存储<assetId, isFavorite>的映射，并链接到AppStorage
   private isFavorMap:SubscribedAbstractProperty<Map<String, boolean>> = AppStorage.setAndLink<Map<String, boolean>>('isFavorMap', new Map<String , boolean>())
 
+  // 循环模式
+  private currentLoopModel: SubscribedAbstractProperty<avSession.LoopMode> =
+    AppStorage.setAndLink("CurrentLoopMode", avSession.LoopMode.LOOP_MODE_SEQUENCE)
 
 
 
@@ -138,7 +141,27 @@ export class ProviderFeature {
       })
     })
 
+    this.session?.on("setLoopMode", async (mode) => {
+      await this.loopMode()
+    })
 
+    this.session?.on("seek", async (position) => {
+      if (position >= this.currentAVMetadata.get().duration!) {
+        this.next()
+      } else {
+        this.avPlayer?.seek(position)
+        this.currentState = {
+          state: this.isPlaying.get() ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
+            avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+          position: {
+            elapsedTime: position,
+            updateTime: new Date().getTime()
+          }
+        }
+        this.session?.setAVPlaybackState(this.currentState, () => {
+        })
+      }
+    })
   }
 
   async UnRegisterListener():Promise<void>{
@@ -149,6 +172,8 @@ export class ProviderFeature {
       this.session.off('playNext')
       this.session.off('playPrevious')
       this.session.off("toggleFavorite")
+      this.session.off("setLoopMode")
+      this.session.off("seek")
     }
     //销毁已创建的会话
     this.session?.destroy((err) => {
@@ -224,8 +249,12 @@ export class ProviderFeature {
   }
 
   //播放模式
-  loopMode() {
-
+  async loopMode() {
+    let currentMode = this.currentLoopModel.get()
+    this.currentLoopModel.set(currentMode === 3 ? 0 : currentMode + 1)
+    this.currentState.loopMode = this.currentLoopModel.get()
+    this.session?.setAVPlaybackState(this.currentState, () => {
+    })
   }
 
   //收藏功能
@@ -236,6 +265,22 @@ export class ProviderFeature {
     this.currentState.isFavorite = this.isFavorMap.get().get(this.currentAVMetadata.get().assetId)
     this.session?.setAVPlaybackState(this.currentState, () => {
     })
+  }
+
+  // 进度
+  async seek(value: number): Promise<void> {
+    let currentPosition = value / 100 * (this.currentAVMetadata.get().duration ?? 0)
+    if (currentPosition >= this.currentAVMetadata.get().duration!) {
+      this.next()
+    } else {
+      this.avPlayer?.seek(currentPosition)
+      this.currentState.position = {
+        elapsedTime: Math.floor(currentPosition),
+        updateTime: new Date().getTime()
+      }
+      this.session?.setAVPlaybackState(this.currentState, () => {
+      })
+    }
   }
 
   // //从数据源中通过itemId获取当前正在播放的AVMetadata并设置给对话

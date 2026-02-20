@@ -21,16 +21,27 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
-    // Main window is created, set main page for this ability
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-
-    windowStage.loadContent('pages/Index', (err) => {
+  onWindowStageCreate(windowStage: window.WindowStage) {
+    // 1.Get the main window of the application.
+    let windowClass: window.Window | undefined = undefined;
+    windowStage.getMainWindow().then(windowClass => {
+      console.info('Succeeded in obtaining the main window. Data: ' + JSON.stringify(windowClass));
+      // 2.Set the window to full screen to achieve immersive effects.
+      windowClass.setWindowLayoutFullScreen(true).then(() => {
+        console.info('Succeeded in setting the window layout to full-screen mode.');
+      }).catch((e: BusinessError) => {
+        console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(e));
+      })
+    }).catch((err: BusinessError) => {
+      console.error('Failed to obtain the main window. Cause: ' + JSON.stringify(err));
+    })
+    // 3.Load the corresponding target page for the immersive window.
+    windowStage.loadContent("pages/Index", (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+        console.error('Failed to load the content. Cause:' + JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      console.info('Succeeded in loading the content.');
     });
   }
 

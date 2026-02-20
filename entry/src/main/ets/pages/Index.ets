@@ -2,6 +2,7 @@ import { media } from '@kit.MediaKit'
 import MediaPlayer from '../utils/MediaPlayerUtils'
 import { ProviderFeature } from '../viewmodel/ProviderManager'
 import { avSession } from '@kit.AVSessionKit'
+import MediaData from '../model/MediaData'
 
 @Entry
 @Component
@@ -20,6 +21,10 @@ struct Index {
   //链接到ProviderFeature中管理的收藏状态Map
   @StorageLink('isFavorMap')isFavorMap:Map<String, boolean> = new Map<String, boolean>();
   @StorageLink("CurrentAVMetadata") currentAVMetadata?: avSession.AVMetadata = undefined
+  @StorageLink("CurrentLoopMode") currentLoopMode: avSession.LoopMode = 0
+
+  @State isProgressSliding: boolean = false
+  private sliderTimer?: number
 
 
   //init方法中存在异步，所以把它放到生命周期执行
@@ -47,7 +52,7 @@ struct Index {
       //大图
       Image($rawfile('first_with_background.png'))
         .width('90%')
-        .margin({ top: '5%', left: '5%' })
+        .margin({ top: '25%', left: '5%' })
       //小标题1
       Text(this.currentPlayItem?.description?.title ? this.currentPlayItem?.description?.title : 'no Data')
         .font({ size: 26, weight: FontWeight.Bold, })
@@ -73,8 +78,19 @@ struct Index {
         .showTips(false)
         .margin({ left: '4%', right: '4%' })
         .onChange((value: number, mode: SliderChangeMode) => {
-          //这是做进度条用的
-          // this.seekPosition = value
+          if (mode === SliderChangeMode.End) {
+            this.providerManager?.seek(value)
+          }
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Up) {
+            this.sliderTimer = setTimeout(() => {
+              this.isProgressSliding = false
+            }, 200)
+          } else {
+            clearTimeout(this.sliderTimer)
+            this.isProgressSliding = true
+          }
         })
       //横向的容器中五个按钮
       Row() {
@@ -86,7 +102,6 @@ struct Index {
         .width(30)
         .aspectRatio(1)
         .backgroundColor(Color.Transparent)
-        //做个三元运算，用isLike判断，默认为false，点一下就是true
         .onClick(() => {
           this.providerManager!.toggleFavorite()
         })
@@ -133,12 +148,14 @@ struct Index {
         })
 
         Button({ stateEffect: true }) {
-          Image($r('app.media.ic_public_random'))
+          Image(MediaData.loopModeList[this.currentLoopMode!])
         }
         .width(30)
         .aspectRatio(1)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
+          this.providerManager!.loopMode()
+          console.log(`loop ${this.currentLoopMode}`)
         })
       }
       .margin({
